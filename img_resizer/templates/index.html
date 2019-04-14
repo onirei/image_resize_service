@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div>
+        <table width="50%" align="center">
+            <tr align="left">
+                <th></th>
+                <th>Изображение</th>
+                <th>Дата создания</th>
+            </tr>
+            {% for image in images %}
+                <tr>
+                    <td align="right"><a href="/image/{{ image.id }}"><img src="{{ image.image.url }}" style="height: 50px"></a></td>
+                    <td><a href="/image/{{ image.id }}">{{ image.image }}</a></td>
+                    <td>{{ image.create_date }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id="pages" align="center">
+        {% if images.has_previous %}
+            <a href="?page={{ images.previous_page_number }}">Previous</a>
+        {% endif %}
+    <span class="current">
+        Page {{ images.number }} of {{ images.paginator.num_pages }}.
+    </span>
+        {% if images.has_next %}
+            <a href="?page={{ images.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+
+{% endblock %}

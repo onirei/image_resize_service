@@ -1,0 +1,8 @@
+*.pyc
+*~
+/static
+.DS_Store
+sandbox.py
+.idea/
+db.sqlite3
+media/img/*

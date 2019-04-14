@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.image_from_file }}
+            {{ form.image_from_url }}
+
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
+
+{% endblock %}

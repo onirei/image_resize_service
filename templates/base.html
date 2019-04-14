@@ -1,0 +1,20 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+      <meta charset="UTF-8">
+      {% if title %}
+      <title>{{ title }}</title>
+      {% else %}
+      <title>Task list</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>
+            <a href="/">IMAGE LIST</a>
+            <a href="/upload/">UPLOAD</a>
+        </div>
+        <br>
+        {% block content %}{% endblock %}
+    </body>
+</html>
