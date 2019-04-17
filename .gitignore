@@ -6,3 +6,4 @@ sandbox.py
 .idea/
 db.sqlite3
 media/img/*
+/*.jpg

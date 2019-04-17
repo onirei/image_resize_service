@@ -5,7 +5,7 @@ from img_resizer import views
 
 
 urlpatterns = [
-    url(r'^$', views.show_image_list, name='create_task'),
-    url(r'^upload/$', views.download_image, name='task_list'),
-    url(r'^<image_hash>/?query_params/$', views.show_image, name='task_list'),
+    url(r'^$', views.show_image_list),
+    url(r'^upload/$', views.download_image),
+    url(r'^(?:(?P<img_hash>\w+)/)?$', views.show_image),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
