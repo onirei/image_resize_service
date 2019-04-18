@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^$', views.show_image_list),
     url(r'^upload/$', views.download_image),
     url(r'^(?:(?P<img_hash>\w+)/)?$', views.show_image),
+    url(r'^delete/(?:(?P<pk>\d+)/)?$', views.del_image),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

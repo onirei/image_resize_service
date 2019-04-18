@@ -3,13 +3,28 @@
 {% block content %}
 
     <div>
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" onsubmit="return validate(this)">
             {% csrf_token %}
             {{ form.image_from_file }}
             {{ form.image_from_url }}
-
             <button type="submit">Сохранить</button>
         </form>
+        <p>{{ error }}</p>
+        <object name="error"></object>
     </div>
+
+    <script>
+        function validate(form) {
+            if (form.elements.image_from_file.value.length === 0 && form.elements.image_from_url.value.length === 0) {
+                document.error.innerHTML = 'Заполните хотя бы одно поле!';
+                return false;
+            }
+            if (form.elements.image_from_file.value.length !== 0 && form.elements.image_from_url.value.length !== 0) {
+                document.error.innerHTML = 'Заполните только одно поле!';
+                return false;
+            }
+        }
+    </script>
+
 
 {% endblock %}

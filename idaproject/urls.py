@@ -20,4 +20,5 @@ from django.conf.urls import include, url
 urlpatterns = [
     # path('admin/', admin.site.urls),
     url(r'', include('img_resizer.urls')),
+    url('api_v1/', include('api_v1.urls')),
 ]

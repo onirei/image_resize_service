@@ -3,44 +3,36 @@
 {% block content %}
 
     <div>
-        <img src="{{ image.image.url }}">
+        <form onsubmit="return validate(this)">
+            <table width="25%" align="center">
+                <tr align="center">
+                    <th><label for="width">Ширина:</label></th>
+                    <th><label for="height">Высота:</label></th>
+                    <th><label for="size">Размер:</label></th>
+                </tr>
+                <tr align="center">
+                    <th><input type="text" name="width" placeholder="Введите высоту" pattern="^[0-9]+$"></th>
+                    <th><input type="text" name="height" placeholder="Введите ширинну" pattern="^[0-9]+$"></th>
+                    <th><input type="text" name="size" placeholder="Введите размер в байтах" pattern="^[0-9]+$"></th>
+                    <th><input type="submit" value="Изменить"></th>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div>
+        <img src="{{ image.image.url }}" style="display: block; margin: auto;">
+        <img src="{{ img }}" style="display: block; margin: auto;">
         {{ params }}
     </div>
-    <form onsubmit="return validate(this)">
-        <table width="25%" align="left">
-            <tr align="center">
-                <th><label for="width">Ширина:</label></th>
-                <th><label for="height">Высота:</label></th>
-                <th><label for="size">Размер:</label></th>
-            </tr>
-            <tr align="center">
-                <th><input type="text" name="width" placeholder="Введите высоту" pattern="^[0-9]+$"></th>
-                <th><input type="text" name="height" placeholder="Введите ширинну" pattern="^[0-9]+$"></th>
-                <th><input type="text" name="size" placeholder="Введите размер в байтах" pattern="^[0-9]+$"></th>
-                <th><input type="submit" value="Изменить"></th>
-            </tr>
-        </table>
-
-    </form>
 
     <script>
-      function validate(form) {
-        for (var i=0;i<form.elements.length;i++) {
-          if (form.elements[i].value.length === 0) {
-            form.elements[i].setAttribute('disabled', 'true');
+        function validate(form) {
+            for (var i=0;i<form.elements.length;i++) {
+                if (form.elements[i].value.length === 0) {
+                    form.elements[i].setAttribute('disabled', 'true');
           }
         }
       }
-{#      function validate(form) {#}
-{#        if (form.elements.width.value.length===0){#}
-{#            form.elements.width.setAttribute('disabled','true');#}
-{#        }#}
-{#        if (form.elements.height.value.length===0){#}
-{#          form.elements.height.setAttribute('disabled','true');#}
-{#        }#}
-{#        if (form.elements.size.value.length===0){#}
-{#          form.elements.size.setAttribute('disabled','true');#}
-{#        }#}
-{#      }#}
     </script>
 {% endblock %}

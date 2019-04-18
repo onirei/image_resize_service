@@ -14,6 +14,7 @@
                     <td align="right"><a href="media/{{ image.image }}"><img src="{{ image.image.url }}" style="height: 50px"></a></td>
                     <td><a href="/{{ image.img_hash }}">{{ image.image }}</a></td>
                     <td>{{ image.create_date }}</td>
+                    <td align="left"><a href="/delete/{{ image.id }}" >Удалить</a></td>
                 </tr>
             {% endfor %}
         </table>

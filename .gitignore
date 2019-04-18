@@ -6,4 +6,5 @@ sandbox.py
 .idea/
 db.sqlite3
 media/img/*
+media/img_cache/*
 /*.jpg
