@@ -8,3 +8,6 @@ db.sqlite3
 media/img/*
 media/img_cache/*
 /*.jpg
+
+!media/img/test1.jpg
+!media/img/test2.jpg

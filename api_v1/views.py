@@ -1,4 +1,5 @@
 from img_resizer.models import Image
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,7 +8,6 @@ from .serializers import ImageSerializer
 from PIL import Image as Image_PIL
 import hashlib
 
-from django.contrib.sites.shortcuts import get_current_site
 
 class ImageList(APIView):
 
