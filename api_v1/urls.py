@@ -1,10 +1,8 @@
-from django.conf.urls import include, url
-from django.urls import include, path
+from django.conf.urls import url
 from api_v1 import views
 from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework.urlpatterns import format_suffix_patterns
-from rest_framework import routers
 
 urlpatterns = [
     url(r'^images/$', views.ImageList.as_view()),

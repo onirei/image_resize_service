@@ -44,12 +44,12 @@ def show_image(request, img_hash):
         img = Image_PIL.open(img_obj.image.url[1:])
         img = img.resize((int(width),int(height)), Image_PIL.ANTIALIAS)
 
-        img.save(path, quality=100)
+        img.save(path, quality=75)
 
         img = Image_PIL.open(path)
         img_size = len(img.fp.read())
         img.save(path)
-        i = 100
+        i = 75
         while img_size>int(size) and i>=1:
             img = Image_PIL.open(path)
             img_size = len(img.fp.read())
