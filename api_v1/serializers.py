@@ -8,3 +8,4 @@ class ImageSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Image.objects.create(**validated_data)
+

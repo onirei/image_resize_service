@@ -4,29 +4,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ImageSerializer
-from rest_framework.decorators import action
-from django.utils.datastructures import MultiValueDictKeyError
-from rest_framework import viewsets
-import random
-import string
 from PIL import Image as Image_PIL
 import hashlib
 
+from django.contrib.sites.shortcuts import get_current_site
 
 class ImageList(APIView):
 
     def get(self, request, format=None):
         images = Image.objects.all()
+        for image in images:
+            image.image = 'http://'+get_current_site(request).domain+'/media/'+str(image.image)
         serializer = ImageSerializer(images, many=True)
         return Response(serializer.data)
 
     def post(self, request,  *args, format=None,  **kwargs):
         f = request.FILES.get('file')
-        # name = ''.join(
-        #     random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(32))
         path = f.name.replace('/', '.').split('.')
         name = path[-2]+'.'+path[-1]
-        # filename = 'media/img/' + name + '.jpg'
         file_path = 'media/img/' + name
         with open(file_path, 'bw') as file:
             for chunk in f.chunks():
@@ -72,7 +67,10 @@ class ImageDetail(APIView):
 
         img.save(path, quality=100)
 
-        image = {'image':path}
+        full_url = ''.join(['http://', get_current_site(request).domain,'/', path])
+
+        image = {'image':full_url}
+
         return Response(image)
 
     def delete(self, request, img_hash, format=None):
