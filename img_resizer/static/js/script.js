@@ -15,8 +15,4 @@ function validate_upload(form) {
         document.error.innerHTML = 'Заполните хотя бы одно поле!';
         return false;
     }
-    if (form.elements.image_from_file.value.length !== 0 && form.elements.image_from_url.value.length !== 0) {
-        document.error.innerHTML = 'Заполните только одно поле!';
-        return false;
-    }
 }

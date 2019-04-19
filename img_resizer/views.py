@@ -83,7 +83,7 @@ def download_handler(url):
 def download_image(request):
     if request.POST:
         form = DownloadImage(request.POST, request.FILES)
-        if form.is_valid() and form.cleaned_data['image_from_file']:
+        if form.is_valid() and form.cleaned_data['image_from_file'] and '_file' in request.POST:
             image_obj = Image()
             image_obj.image = form.cleaned_data['image_from_file']
             img = Image_PIL.open(image_obj.image)
@@ -96,7 +96,7 @@ def download_image(request):
                 error = 'Этот файл уже загружен на сервер'
                 return render(request, 'upload.html', {'form': form, 'error': error})
 
-        elif form.is_valid() and form.cleaned_data['image_from_url']:
+        elif form.is_valid() and form.cleaned_data['image_from_url'] and '_url' in request.POST:
             image_obj = Image()
             image_obj.image = download_handler(form.cleaned_data['image_from_url'])
             img = Image_PIL.open(image_obj.image)

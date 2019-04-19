@@ -5,17 +5,18 @@
     <div>
         <form method="post" enctype="multipart/form-data" onsubmit="return validate_upload(this)">
             {% csrf_token %}
-            <table class="table_center">
-                <tr>
-                    <th>{{ form.image_from_file.label }}</th>
-                    <th>{{ form.image_from_url.label }}</th>
-                </tr>
-                <tr>
-                    <th>{{ form.image_from_file }}</th>
-                    <th>{{ form.image_from_url }}</th>
-                    <th><button type="submit">Сохранить</button></th>
-                </tr>
-            </table>
+            <div class="tabs">
+                <input type="radio" checked="checked" name="tab" id="tab1"/><label for="tab1">{{ form.image_from_file.label }}</label>
+                <input type="radio" name="tab" id="tab2"/><label for="tab2">{{ form.image_from_url.label }}</label>
+                <div>
+                    {{ form.image_from_file }}
+                    <button type="submit" name="_file">Сохранить</button>
+                </div>
+                <div>
+                    {{ form.image_from_url }}
+                    <button type="submit" name="_url">Сохранить</button>
+                </div>
+            </div>
         </form>
 
         <div class="center">
@@ -26,3 +27,4 @@
     </div>
 
 {% endblock %}
+
