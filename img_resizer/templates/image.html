@@ -3,16 +3,16 @@
 {% block content %}
 
     <div>
-        <form onsubmit="return validate(this)">
-            <table width="25%" align="center">
-                <tr align="center">
-                    <th><label for="width">Ширина:</label></th>
-                    <th><label for="height">Высота:</label></th>
-                    <th><label for="size">Размер:</label></th>
+        <form onsubmit="return queryset_filter(this)">
+            <table class="table_center">
+                <tr>
+                    <th><label for="width">Ширина: {{ params.width }} px</label></th>
+                    <th><label for="height">Высота: {{ params.height }} px</label></th>
+                    <th><label for="size">Размер: {{ params.size }} bytes</label></th>
                 </tr>
-                <tr align="center">
-                    <th><input type="text" name="width" placeholder="Введите высоту" pattern="^[0-9]+$"></th>
-                    <th><input type="text" name="height" placeholder="Введите ширинну" pattern="^[0-9]+$"></th>
+                <tr>
+                    <th><input type="text" name="width" placeholder="Введите ширинну" pattern="^[0-9]+$"></th>
+                    <th><input type="text" name="height" placeholder="Введите высоту" pattern="^[0-9]+$"></th>
                     <th><input type="text" name="size" placeholder="Введите размер в байтах" pattern="^[0-9]+$"></th>
                     <th><input type="submit" value="Изменить"></th>
                 </tr>
@@ -21,18 +21,8 @@
     </div>
 
     <div>
-        <img src="{{ image.image.url }}" style="display: block; margin: auto;">
-        <img src="{{ img }}" style="display: block; margin: auto;">
-        {{ params }}
+        <img src="{{ image.image.url }}" class="img_center">
+        <img src="{{ img }}" class="img_center">
     </div>
 
-    <script>
-        function validate(form) {
-            for (var i=0;i<form.elements.length;i++) {
-                if (form.elements[i].value.length === 0) {
-                    form.elements[i].setAttribute('disabled', 'true');
-          }
-        }
-      }
-    </script>
 {% endblock %}

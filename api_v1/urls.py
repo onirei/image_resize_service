@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework.urlpatterns import format_suffix_patterns
 
+
 urlpatterns = [
     url(r'^images/$', views.ImageList.as_view()),
     url(r'^images/(?:(?P<img_hash>\w+)/)?$', views.ImageDetail.as_view()),

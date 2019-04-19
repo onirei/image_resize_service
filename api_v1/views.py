@@ -7,6 +7,7 @@ from rest_framework import status
 from .serializers import ImageSerializer
 from PIL import Image as Image_PIL
 import hashlib
+import os
 
 
 class ImageList(APIView):
@@ -85,5 +86,6 @@ class ImageDetail(APIView):
 
     def delete(self, request, img_hash, format=None):
         image = self.get_object(img_hash)
+        os.remove(image.image.path)
         image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

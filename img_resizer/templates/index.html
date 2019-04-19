@@ -3,24 +3,24 @@
 {% block content %}
 
     <div>
-        <table width="50%" align="center">
-            <tr align="left">
+        <table class="table_center">
+            <tr class="left">
                 <th></th>
                 <th>Изображение</th>
                 <th>Дата создания</th>
             </tr>
             {% for image in images %}
                 <tr>
-                    <td align="right"><a href="media/{{ image.image }}"><img src="{{ image.image.url }}" style="height: 50px"></a></td>
-                    <td><a href="/{{ image.img_hash }}">{{ image.image }}</a></td>
+                    <td class="right"><a href="/media/{{ image.image }}"><img src="{{ image.image.url }}" style="height: 50px"></a></td>
+                    <td><a href="/{{ image.img_hash }}/">{{ image.image }}</a></td>
                     <td>{{ image.create_date }}</td>
-                    <td align="left"><a href="/delete/{{ image.id }}" >Удалить</a></td>
+                    <td class="left"><a href="/delete/{{ image.id }}/" >Удалить</a></td>
                 </tr>
             {% endfor %}
         </table>
     </div>
 
-    <div id="pages" align="center">
+    <div class="center">
         {% if images.has_previous %}
             <a href="?page={{ images.previous_page_number }}">Previous</a>
         {% endif %}

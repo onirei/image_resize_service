@@ -7,6 +7,7 @@ import requests
 import hashlib
 from PIL import Image as Image_PIL
 from django.db import IntegrityError
+import os
 from django.views.decorators.cache import cache_page
 
 
@@ -22,14 +23,16 @@ def show_image_list(request):
         images = paginator.page(paginator.num_pages)
     return render_to_response('index.html', {'images': images})
 
-# @cache_page(600, cache='default', key_prefix='')
+
+@cache_page(600, cache='default', key_prefix='')
 def show_image(request, img_hash):
     img_obj = Image.objects.get(img_hash=img_hash)
     width = request.GET.get('width')
     height = request.GET.get('height')
     size = request.GET.get('size')
     if not width and not height and not size:
-        return render(request, 'image.html', {'image': img_obj})
+        params = {'width':img_obj.image.width, 'height':img_obj.image.height, 'size':img_obj.image.size}
+        return render(request, 'image.html', {'image': img_obj, 'params':params})
     else:
         if not width:
             width = img_obj.image.width
@@ -56,12 +59,13 @@ def show_image(request, img_hash):
             img.save(path, quality=i)
             i += -1
 
-        params = [width, height, size, img_size]
+        params = {'width': width, 'height': height, 'size': img_size}
         return render(request, 'image.html', {'img':'/'+path, 'params': params})
 
 
 def del_image(request, pk):
     task_obj = Image.objects.get(id=pk)
+    os.remove(task_obj.image.path)
     task_obj.delete()
     return HttpResponseRedirect('/')
 
