@@ -1,37 +1,64 @@
-from img_resizer.models import Image
+import os
+import hashlib
+import requests
+from PIL import Image as Image_PIL
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import ImageSerializer
-from PIL import Image as Image_PIL
-import hashlib
-import os
+from api_v1.serializers import ImageSerializer
+from img_resizer.models import Image
 
 
 class ImageList(APIView):
 
+    path = settings.MEDIA_URL[1:]
+
+    def download_handler_url(self, url):
+        r = requests.get(url, stream=True)
+        file_name = '{}/{}'.format(
+            Image._meta.get_field('image').upload_to,
+            url.split('/')[-1]
+        )
+        file_path = self.path + file_name
+        with open(file_path, 'bw') as file:
+            for chunk in r.iter_content(2048):
+                file.write(chunk)
+        return file_name
+
+    def download_handler_file(self, f):
+        file_name = '{}/{}'.format(
+            Image._meta.get_field('image').upload_to,
+            f.name.split('/')[-1]
+        )
+        file_path = self.path + file_name
+        with open(file_path, 'bw') as file:
+            for chunk in f.chunks(2048):
+                file.write(chunk)
+        return file_name
+
     def get(self, request, format=None):
         images = Image.objects.all()
         for image in images:
-            image.image = 'http://'+get_current_site(request).domain+'/media/'+str(image.image)
+            image.image = get_current_site(request).domain + image.image.url
         serializer = ImageSerializer(images, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request,  *args, format=None,  **kwargs):
-        f = request.FILES.get('file')
-        path = f.name.replace('/', '.').split('.')
-        name = path[-2]+'.'+path[-1]
-        file_path = 'media/img/' + name
-        with open(file_path, 'bw') as file:
-            for chunk in f.chunks():
-                file.write(chunk)
-        image = 'img/' + name
-        img = Image_PIL.open('media/'+image)
+        if self.request.query_params.get('from') == 'url':
+            url = self.request.query_params.get('url')
+            file_name = self.download_handler_url(url)
+        elif self.request.query_params.get('from') == 'file':
+            f = request.FILES.get('file')
+            file_name = self.download_handler_file(f)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        img = Image_PIL.open(self.path + file_name)
         img_hash = hashlib.md5(img.tobytes()).hexdigest()
 
-        data = {'image':image, 'img_hash':img_hash}
+        data = {'image':file_name, 'img_hash':img_hash}
         serializer = ImageSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -41,7 +68,8 @@ class ImageList(APIView):
 
 class ImageDetail(APIView):
 
-    def get_object(self, img_hash):
+    @staticmethod
+    def get_object(img_hash):
         try:
             return Image.objects.get(img_hash=img_hash)
         except Image.DoesNotExist:
@@ -60,28 +88,31 @@ class ImageDetail(APIView):
             size = image.image.size
 
         path = image.image.name.replace('/', '.').split('.')
-        path = 'media/img_cache/' + path[-2] + '_w' + str(width) + '_h' + str(height) + '_s' + str(size) + '.' + path[
-            -1]
+        path = '{}{}{}_w{}_h{}_s{}.{}'.format(
+            settings.MEDIA_URL[1:], settings.MEDIA_HASH_URL,
+            path[-2], str(width), str(height), str(size), path[-1]
+        )
 
-        img = Image_PIL.open(image.image.url[1:])
-        img = img.resize((int(width), int(height)), Image_PIL.ANTIALIAS)
-
-        img.save(path, quality=75)
-
-        img = Image_PIL.open(path)
-        img_size = len(img.fp.read())
-        img.save(path)
-        i = 75
-        while img_size>int(size) and i>=1:
+        if os.path.isfile(path):
             img = Image_PIL.open(path)
             img_size = len(img.fp.read())
-            img.save(path, quality=i)
-            i += -1
+        else:
+            img = Image_PIL.open(image.image.url[1:])
+            img = img.resize((int(width), int(height)), Image_PIL.ANTIALIAS)
+            img.save(path, quality=75)
 
-        full_url = ''.join(['http://', get_current_site(request).domain,'/', path])
+            img = Image_PIL.open(path)
+            img_size = len(img.fp.read())
+            img.save(path)
+            i = 75
+            while img_size > int(size) and i >= 1:
+                img = Image_PIL.open(path)
+                img_size = len(img.fp.read())
+                img.save(path, quality=i)
+                i += -1
 
-        image = {'image':full_url}
-
+        full_url = ''.join([get_current_site(request).domain, '/', path])
+        image = {'width':width, 'height':height, 'img_size':img_size, 'image':full_url}
         return Response(image, status=status.HTTP_200_OK)
 
     def delete(self, request, img_hash, format=None):
