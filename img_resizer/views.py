@@ -11,7 +11,6 @@ from PIL import Image as Image_PIL
 from img_resizer.models import Image
 from img_resizer.forms import DownloadImage
 
-from django.contrib.sites.shortcuts import get_current_site
 
 def show_image_list(request):
     image_list = Image.objects.all().order_by('id')
@@ -24,14 +23,9 @@ def show_image_list(request):
     except EmptyPage:
         images = paginator.page(paginator.num_pages)
     return render_to_response('index.html', {'images': images})
-    # image = Image()
-    # field_label = image._meta.get_field('image').upload_to
-    # path = settings.MEDIA_URL[1:] + Image._meta.get_field('image').upload_to
-    # dirlist = [get_current_site(request).domain, get_current_site(request).name]
-    # return render(request, "index.html", {'dirlist': dirlist})
 
 
-# @cache_page(600, cache='default', key_prefix='')
+@cache_page(600, cache='default', key_prefix='')
 def show_image(request, img_hash):
     img_obj = Image.objects.get(img_hash=img_hash)
     width = request.GET.get('width')
