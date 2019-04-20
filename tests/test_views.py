@@ -1,7 +1,7 @@
-from django.test import TestCase
-from img_resizer.models import Image
-from rest_framework import status
 import shutil
+from django.test import TestCase
+from rest_framework import status
+from img_resizer.models import Image
 
 
 class ImageViewTest(TestCase):

@@ -1,7 +1,7 @@
-from img_resizer.models import Image
+import shutil
 from rest_framework import status
 from rest_framework.test import APITestCase
-import shutil
+from img_resizer.models import Image
 
 
 class ApiV1Test(APITestCase):
@@ -10,7 +10,8 @@ class ApiV1Test(APITestCase):
 
     def setUp(self):
         shutil.copyfile('media/img/test1.jpg', 'media/img/test0.jpg')
-        self.record = Image.objects.create(id='1', image = 'img/test0.jpg', img_hash = '123')
+        self.record = Image.objects.create(id='1', image = 'img/test0.jpg',
+                                           img_hash = '123')
 
     def test_get(self):
         url = self.base_url+'images/'

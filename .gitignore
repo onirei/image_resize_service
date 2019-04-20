@@ -11,3 +11,4 @@ media/img_cache/*
 
 !media/img/test1.jpg
 !media/img/test2.jpg
+!media/img_cache/.gitkeep

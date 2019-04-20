@@ -6,11 +6,17 @@ class FormTest(TestCase):
 
     def test_form_file_field_label(self):
         form = DownloadImage()
-        self.assertTrue(not form.fields['image_from_file'].label or form.fields['image_from_file'].label == 'Сохранить из файла')
+        self.assertTrue(
+            not form.fields['image_from_file'].label or
+            form.fields['image_from_file'].label == 'Сохранить из файла'
+            )
 
     def test_form_url_field_label(self):
         form = DownloadImage()
-        self.assertTrue(not form.fields['image_from_url'].label or form.fields['image_from_url'].label == 'Сохранить по ссылке')
+        self.assertTrue(
+            not form.fields['image_from_url'].label or
+            form.fields['image_from_url'].label == 'Сохранить по ссылке'
+            )
 
     def test_form_url_field_max_length(self):
         form = DownloadImage()
