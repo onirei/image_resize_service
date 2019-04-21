@@ -8,7 +8,7 @@ class ImageViewTest(TestCase):
 
     def setUp(self):
         shutil.copyfile('media/img/test1.jpg', 'media/img/test0.jpg')
-        Image.objects.create(id='1', image = 'img/test0.jpg', img_hash = '123')
+        Image.objects.create(id='1', image ='img/test0.jpg', img_hash ='123')
 
     def test_view_url_exists_show_image_list(self):
         resp = self.client.get('/')
@@ -17,6 +17,10 @@ class ImageViewTest(TestCase):
     def test_view_url_exists_show_image_list_page1(self):
         resp = self.client.get('/?page=1')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_view_url_not_exists_show_image_list_page1(self):
+        resp = self.client.get('/?page=99')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_view_url_exists_download_image(self):
         resp = self.client.get('/upload/')

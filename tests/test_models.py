@@ -5,7 +5,7 @@ from img_resizer.models import Image
 class ModelTest(TestCase):
 
     def setUp(self):
-        Image.objects.create(id='1', image = 'img/test1.jpg', img_hash = '123')
+        Image.objects.create(id='1', image ='img/test1.jpg', img_hash ='123')
 
     def test_image_label(self):
         image=Image.objects.get(id=1)

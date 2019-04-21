@@ -41,21 +41,26 @@ class ImageList(APIView):
     def get(self, request, format=None):
         images = Image.objects.all()
         for image in images:
-            image.image = get_current_site(request).domain + image.image.url
+            image.image = get_current_site(self.request).domain + image.image.url
         serializer = ImageSerializer(images, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request,  *args, format=None,  **kwargs):
-        if self.request.query_params.get('from') == 'url':
-            url = self.request.query_params.get('url')
-            file_name = self.download_handler_url(url)
-        elif self.request.query_params.get('from') == 'file':
+    def post(self, request, *args, format=None, **kwargs):
+        if request.FILES:
             f = request.FILES.get('file')
             file_name = self.download_handler_file(f)
+        elif request.data:
+            url = request.data['url']
+            file_name = self.download_handler_url(url)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
         img = Image_PIL.open(self.path + file_name)
         img_hash = hashlib.md5(img.tobytes()).hexdigest()
+
+        if Image.objects.filter(img_hash=img_hash).exists():
+            error = {'error': 'Этот файл уже загружен на сервер'}
+            return Response(error)
 
         data = {'image':file_name, 'img_hash':img_hash}
         serializer = ImageSerializer(data=data)
@@ -109,12 +114,12 @@ class ImageDetail(APIView):
                 img.save(path, quality=i)
                 i += -1
 
-        full_url = ''.join([get_current_site(request).domain, '/', path])
+        full_url = ''.join([get_current_site(self.request).domain, '/', path])
         image = {'width':width, 'height':height, 'img_size':img_size, 'image':full_url}
         return Response(image, status=status.HTTP_200_OK)
 
     def delete(self, request, img_hash, format=None):
         image = self.get_object(img_hash)
-        os.remove(image.image.path)
+        os.remove(image.image.url[1:])
         image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
