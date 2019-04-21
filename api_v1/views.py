@@ -62,7 +62,7 @@ class ImageList(APIView):
             error = {'error': 'Этот файл уже загружен на сервер'}
             return Response(error)
 
-        data = {'image':file_name, 'img_hash':img_hash}
+        data = {'image': file_name, 'img_hash':img_hash}
         serializer = ImageSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

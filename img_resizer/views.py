@@ -94,10 +94,10 @@ class UploadImageView(View):
         form = DownloadImage(self.request.POST, self.request.FILES)
         image_obj = Image()
         if (form.is_valid() and form.cleaned_data['image_from_file'] and
-                    '_file' in self.request.POST):
+                '_file' in self.request.POST):
             image_obj.image = form.cleaned_data['image_from_file']
         elif (form.is_valid() and form.cleaned_data['image_from_url'] and
-                      '_url' in self.request.POST):
+              '_url' in self.request.POST):
             image_obj.image = self.download_handler(
                 form.cleaned_data['image_from_url'])
         img = Image_PIL.open(image_obj.image)
