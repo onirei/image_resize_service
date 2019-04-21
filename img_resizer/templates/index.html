@@ -2,7 +2,6 @@
 
 {% block content %}
 
-    {{ dirlist }}
     <div>
         <table class="table_center">
             <tr class="left">
@@ -22,14 +21,14 @@
     </div>
 
     <div class="center">
-        {% if images.has_previous %}
-            <a href="?page={{ images.previous_page_number }}">Previous</a>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
         {% endif %}
     <span class="current">
-        Page {{ images.number }} of {{ images.paginator.num_pages }}.
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
     </span>
-        {% if images.has_next %}
-            <a href="?page={{ images.next_page_number }}">Next</a>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
         {% endif %}
     </div>
 

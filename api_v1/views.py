@@ -13,7 +13,6 @@ from img_resizer.models import Image
 
 
 class ImageList(APIView):
-
     path = settings.MEDIA_URL[1:]
 
     def download_handler_url(self, url):
@@ -67,7 +66,6 @@ class ImageList(APIView):
 
 
 class ImageDetail(APIView):
-
     @staticmethod
     def get_object(img_hash):
         try:
