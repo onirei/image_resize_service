@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from PIL import Image as Image_PIL
@@ -72,7 +72,12 @@ class ImageDetailView(View):
                                                   'params': params})
 
 
-class UploadImageView(View):
+class UploadImageView(CreateView):
+    model = Image
+    form_class = DownloadImage
+    success_url = '/'
+    template_name = 'upload.html'
+
     @staticmethod
     def download_handler(url):
         r = requests.get(url, stream=True)
@@ -85,30 +90,26 @@ class UploadImageView(View):
                 file.write(chunk)
         return file_name
 
-    @staticmethod
-    def get(request):
-        form = DownloadImage()
-        return render(request, 'upload.html', {'form': form})
-
-    def post(self, request):
-        form = DownloadImage(self.request.POST, self.request.FILES)
-        image_obj = Image()
-        if (form.is_valid() and form.cleaned_data['image_from_file'] and
-                '_file' in self.request.POST):
-            image_obj.image = form.cleaned_data['image_from_file']
-        elif (form.is_valid() and form.cleaned_data['image_from_url'] and
-              '_url' in self.request.POST):
-            image_obj.image = self.download_handler(
-                form.cleaned_data['image_from_url'])
-        img = Image_PIL.open(image_obj.image)
-        image_obj.img_hash = hashlib.md5(img.tobytes()).hexdigest()
-        if Image.objects.filter(img_hash=image_obj.img_hash).exists():
-            error = 'Этот файл уже загружен на сервер'
-            return render(request, 'upload.html', {'form': form,
-                                                   'error': error})
+    def form_valid(self, form):
+        if form.is_valid():
+            self.object = form.save()
+            if '_file' in self.request.POST:
+                self.object.image = form.cleaned_data['image_from_file']
+            elif '_url' in self.request.POST:
+                self.object.image = self.download_handler(
+                    form.cleaned_data['image_from_url'])
+            img = Image_PIL.open(self.object.image)
+            self.object.img_hash = hashlib.md5(img.tobytes()).hexdigest()
+            if Image.objects.filter(img_hash=self.object.img_hash).exists():
+                self.object.delete()
+                error = 'Этот файл уже загружен на сервер'
+                return self.render_to_response(
+                    self.get_context_data(form=form, error=error))
+            else:
+                form.save()
+                return super().form_valid(form)
         else:
-            image_obj.save()
-            return HttpResponseRedirect('/')
+            return self.render_to_response(self.get_context_data(form=form))
 
 
 class DeleteImageView(View):

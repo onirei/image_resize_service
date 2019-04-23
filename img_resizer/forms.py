@@ -10,11 +10,7 @@ class DownloadImage(forms.ModelForm):
 
     class Meta:
         model = Image
-        fields = [
-            'image_from_file',
-            'image_from_url'
-        ]
-        labels = {
-            'image_file': 'File',
-            'image_url': 'URL'
-        }
+        fields = ['image',]
+
+
+
