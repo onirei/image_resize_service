@@ -1,13 +1,10 @@
 import os
 import requests
 import hashlib
-from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.views import View
-from django.views.generic import ListView, CreateView
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
+from django.views.generic import ListView, CreateView, DetailView
 from PIL import Image as Image_PIL
 from img_resizer.models import Image
 from img_resizer.forms import DownloadImage
@@ -20,56 +17,57 @@ class ImageListView(ListView):
     template_name = 'index.html'
 
 
-class ImageDetailView(View):
-    @method_decorator(cache_page(60 * 10))
-    def get(self, request, img_hash):
-        img_obj = Image.objects.get(img_hash=img_hash)
+class ImageDetailView(DetailView):
+    model = Image
+    slug_field = 'img_hash'
+    slug_url_kwarg = 'img_hash'
+    template_name = 'image.html'
+
+    def resize_image(self, width, height, size):
+        path = self.object.image.name.replace('/', '.').split('.')
+        path = '{}{}{}_w{}_h{}_s{}.{}'.format(
+            settings.MEDIA_URL[1:], settings.MEDIA_HASH_URL,
+            path[-2], str(width), str(height), str(size), path[-1]
+        )
+
+        if os.path.isfile(path):
+            img = Image_PIL.open(path)
+            img_size = len(img.fp.read())
+        else:
+            img = Image_PIL.open(self.object.image.url[1:])
+            img = img.resize((int(width), int(height)),
+                             Image_PIL.ANTIALIAS)
+            img.save(path, quality=75)
+
+            img = Image_PIL.open(path)
+            img_size = len(img.fp.read())
+            img.save(path)
+            q = 75
+            while img_size > int(size) and q >= 1:
+                img = Image_PIL.open(path)
+                img_size = len(img.fp.read())
+                img.save(path, quality=q)
+                q += -1
+        params = {'width': width, 'height': height, 'size': img_size}
+        path = ''.join(['/', path])
+        return {'image':path, 'params':params}
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ImageDetailView, self).get_context_data(**kwargs)
+
         width = self.request.GET.get('width')
         height = self.request.GET.get('height')
         size = self.request.GET.get('size')
-        if not width and not height and not size:
-            params = {'width': img_obj.image.width,
-                      'height': img_obj.image.height,
-                      'size': img_obj.image.size}
-            return render(request, 'image.html', {'image': img_obj,
-                                                  'params': params})
-        else:
-            if not width:
-                width = img_obj.image.width
-            if not height:
-                height = img_obj.image.height
-            if not size:
-                size = img_obj.image.size
-
-            path = img_obj.image.name.replace('/', '.').split('.')
-            path = '{}{}{}_w{}_h{}_s{}.{}'.format(
-                settings.MEDIA_URL[1:], settings.MEDIA_HASH_URL,
-                path[-2], str(width), str(height), str(size), path[-1]
-            )
-
-            if os.path.isfile(path):
-                img = Image_PIL.open(path)
-                img_size = len(img.fp.read())
-            else:
-                img = Image_PIL.open(img_obj.image.url[1:])
-                img = img.resize((int(width), int(height)),
-                                 Image_PIL.ANTIALIAS)
-                img.save(path, quality=75)
-
-                img = Image_PIL.open(path)
-                img_size = len(img.fp.read())
-                img.save(path)
-                q = 75
-                while img_size > int(size) and q >= 1:
-                    img = Image_PIL.open(path)
-                    img_size = len(img.fp.read())
-                    img.save(path, quality=q)
-                    q += -1
-
-            params = {'width': width, 'height': height, 'size': img_size}
-            path = ''.join(['/', path])
-            return render(request, 'image.html', {'img': path,
-                                                  'params': params})
+        if not width:
+            width = self.object.image.width
+        if not height:
+            height = self.object.image.height
+        if not size:
+            size = self.object.image.size
+        img = self.resize_image(width, height, size)
+        context['image'] = img['image']
+        context['params'] = img['params']
+        return context
 
 
 class UploadImageView(CreateView):
