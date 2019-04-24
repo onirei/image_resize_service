@@ -53,8 +53,8 @@
     # Процес локального запуска приложения
 Для локального запуска приложения созданы идентичные скрипты start.bat и start.sh. Они выполлняют следующие команды:
 + pip install -r requirements.txt - установка пакетов необходимых для работы приложения.
-+ python manage.py makemigrations - проверка изменения модели в приложении (опционально, да).
-+ python manage.py migrate - создание базы данных и запись в неё модели приложения.
++ python manage.py makemigrations - создание миграции модели в бд.
++ python manage.py migrate - создание таблиц в бд на основе миграции (в данном случае создание бд, т.к. SQLite.
 + python manage.py createcachetable - создание в базе данных таблицы для хранения хэша.
 + python manage.py runserver - запус самого приложения (по умолчанию localhost:8000)
 
