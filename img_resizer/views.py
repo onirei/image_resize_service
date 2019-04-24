@@ -29,7 +29,6 @@ class ImageDetailView(DetailView):
             settings.MEDIA_URL[1:], settings.MEDIA_HASH_URL,
             path[-2], str(width), str(height), str(size), path[-1]
         )
-
         if os.path.isfile(path):
             img = Image_PIL.open(path)
             img_size = len(img.fp.read())
@@ -54,7 +53,6 @@ class ImageDetailView(DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ImageDetailView, self).get_context_data(**kwargs)
-
         width = self.request.GET.get('width')
         height = self.request.GET.get('height')
         size = self.request.GET.get('size')
