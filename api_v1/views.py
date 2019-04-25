@@ -17,10 +17,8 @@ class ImageList(APIView):
 
     def download_handler_url(self, url):
         r = requests.get(url, stream=True)
-        file_name = '{}/{}'.format(
-            Image._meta.get_field('image').upload_to,
-            url.split('/')[-1]
-        )
+        file_name = (f"{Image._meta.get_field('image').upload_to}/"
+                     f"{url.split('/')[-1]}")
         file_path = self.path + file_name
         with open(file_path, 'bw') as file:
             for chunk in r.iter_content(2048):
@@ -28,10 +26,8 @@ class ImageList(APIView):
         return file_name
 
     def download_handler_file(self, f):
-        file_name = '{}/{}'.format(
-            Image._meta.get_field('image').upload_to,
-            f.name.split('/')[-1]
-        )
+        file_name = (f"{Image._meta.get_field('image').upload_to}/"
+                     f"{f.name.split('/')[-1]}")
         file_path = self.path + file_name
         with open(file_path, 'bw') as file:
             for chunk in f.chunks(2048):
@@ -41,7 +37,8 @@ class ImageList(APIView):
     def get(self, request, format=None):
         images = Image.objects.all()
         for image in images:
-            image.image = get_current_site(self.request).domain + image.image.url
+            image.image = get_current_site(self.request).domain + \
+                          image.image.url
         serializer = ImageSerializer(images, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -91,10 +88,8 @@ class ImageDetail(APIView):
             size = image.image.size
 
         path = image.image.name.replace('/', '.').split('.')
-        path = '{}{}{}_w{}_h{}_s{}.{}'.format(
-            settings.MEDIA_URL[1:], settings.MEDIA_HASH_URL,
-            path[-2], str(width), str(height), str(size), path[-1]
-        )
+        path = (f'{settings.MEDIA_URL[1:]}{settings.MEDIA_HASH_URL}{path[-2]}'
+                f'_w{str(width)}_h{str(height)}_s{str(size)}.{path[-1]}')
 
         if os.path.isfile(path):
             img = Image_PIL.open(path)
@@ -114,8 +109,9 @@ class ImageDetail(APIView):
                 img.save(path, quality=i)
                 i += -1
 
-        full_url = ''.join([get_current_site(self.request).domain, '/', path])
-        image = {'width':width, 'height':height, 'img_size':img_size, 'image':full_url}
+        full_url = f'{get_current_site(self.request).domain}/{path}'
+        image = {'width': width, 'height': height,
+                 'img_size': img_size, 'image': full_url}
         return Response(image, status=status.HTTP_200_OK)
 
     def delete(self, request, img_hash, format=None):

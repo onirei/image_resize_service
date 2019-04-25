@@ -25,10 +25,8 @@ class ImageDetailView(DetailView):
 
     def resize_image(self, width, height, size):
         path = self.object.image.name.replace('/', '.').split('.')
-        path = '{}{}{}_w{}_h{}_s{}.{}'.format(
-            settings.MEDIA_URL[1:], settings.MEDIA_HASH_URL,
-            path[-2], str(width), str(height), str(size), path[-1]
-        )
+        path = (f'{settings.MEDIA_URL[1:]}{settings.MEDIA_HASH_URL}{path[-2]}'
+                f'_w{str(width)}_h{str(height)}_s{str(size)}.{path[-1]}')
         if os.path.isfile(path):
             img = Image_PIL.open(path)
             img_size = len(img.fp.read())
@@ -49,7 +47,7 @@ class ImageDetailView(DetailView):
                 q += -1
         params = {'width': width, 'height': height, 'size': img_size}
         path = ''.join(['/', path])
-        return {'image':path, 'params':params}
+        return {'image': path, 'params': params}
 
     def get_context_data(self, *args, **kwargs):
         context = super(ImageDetailView, self).get_context_data(**kwargs)
@@ -78,8 +76,8 @@ class UploadImageView(CreateView):
     def download_handler(url):
         r = requests.get(url, stream=True)
         path = settings.MEDIA_URL[1:]
-        file_name = '{}/{}'.format(Image._meta.get_field('image').upload_to,
-                                   url.split('/')[-1])
+        file_name = (f"{Image._meta.get_field('image').upload_to}/"
+                     f"{url.split('/')[-1]}")
         file_path = path + file_name
         with open(file_path, 'bw') as file:
             for chunk in r.iter_content(2048):
